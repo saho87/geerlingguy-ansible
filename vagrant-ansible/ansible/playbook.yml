@@ -1,0 +1,8 @@
+---
+- name: Ansible Test Playbook
+  become: false
+  hosts: all
+  tasks:
+    - name: Verify Ansible is working
+      ping:
+...
