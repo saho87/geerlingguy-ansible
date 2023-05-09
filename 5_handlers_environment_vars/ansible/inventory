@@ -1,0 +1,17 @@
+# application servers
+[centos]
+192.168.60.11
+
+# database server
+[ubuntu]
+192.168.60.12
+
+# group has all the servers
+[multi:children]
+centos
+ubuntu
+
+# Variables for all the servers
+[multi:vars]
+ansible_user=vagrant
+ansible_ssh_private_key_file=~/.vagrant.d/insecure_private_key

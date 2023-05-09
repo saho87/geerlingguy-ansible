@@ -1,0 +1,43 @@
+---
+- hosts: centos
+  become: true
+  
+  handlers:
+    - name: restart apache
+      service:
+        name: httpd
+        state: restarted
+
+  tasks:
+    # sucht nach 'ENV_VAR' -> wenn 
+    - name: add an environment variable to the remote user's shell
+      lineinfile:
+        dest: ~/.bash_profile
+        regexp: '^ENV_VAR='
+        line: 'ENV_VAR=value'
+      become: false
+    
+    - name: get the value of environment variable
+      
+
+    - name: install Apache
+      yum:
+        name: httpd
+        state: present
+    
+    - name: copy config
+      copy:
+        src: files/test.conf
+        dest: /etc/httpd/conf.d
+      notify: restart apache
+    
+    # führt Handler gleich aus, nicht am Ende des Playbooks
+    # --force-handlers beim Aufruf des Playbook führt Handler aus auch wenn Play fehlschlägt
+    - name: make shure handlers are flushed immediately
+      meta: flush_handlers
+      
+    - name: Ensure Apache is running on start
+      service:
+        name: httpd
+        state: started
+        enabled: true
