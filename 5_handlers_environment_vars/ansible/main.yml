@@ -1,5 +1,5 @@
 ---
-- hosts: centos
+- hosts: all
   become: true
   
   handlers:
@@ -8,27 +8,43 @@
         name: httpd
         state: restarted
 
+  # funktioniert auch mit default Variablen und Modul include_vars (Folge 5, min 47)     
+  vars_files:
+    - vars/{{ ansible_os_family }}.yml
+  
   tasks:
-    # sucht nach 'ENV_VAR' -> wenn 
-    - name: add an environment variable to the remote user's shell
-      lineinfile:
-        dest: ~/.bash_profile
-        regexp: '^ENV_VAR='
-        line: 'ENV_VAR=value'
-      become: false
+    # sucht nach 'ENV_VAR' -> wenn nicht vorhanden, dann fügt er Ausdruck am Ende an
+    #- name: add an environment variable to the remote user's shell
+    #  lineinfile:
+    #    dest: ~/.bashrc
+    #    regexp: '^ENV_VAR='
+    #    line: 'ENV_VAR=value'
+    #  become: false
+
     
-    - name: get the value of environment variable
-      
+    #- name: get the value of environment variable
+    #  # shell nutzt standardmäßig /bin/bash über ssh Verbindung
+    #  # command für Befehle direkt aus
+    #  # Setzen einer globalen Variablen in /etc/environment
+    #  # funktioniert hier bei ubuntu nicht
+    #  shell: "source ~/.bashrc && echo ${ENV_VAR}"
+    #  register: foo
+    #  become: false
+
+    #- debug: msg="Environment variable value = {{ foo }}"
 
     - name: install Apache
-      yum:
-        name: httpd
+      package:
+        name: "{{ apache_package }}"
         state: present
+      register: foo
     
+    - debug: var=foo
+      
     - name: copy config
       copy:
         src: files/test.conf
-        dest: /etc/httpd/conf.d
+        dest: "{{ apache_config_dir }}"
       notify: restart apache
     
     # führt Handler gleich aus, nicht am Ende des Playbooks
@@ -38,6 +54,6 @@
       
     - name: Ensure Apache is running on start
       service:
-        name: httpd
+        name: "{{ apache_package }}"
         state: started
         enabled: true
