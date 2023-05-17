@@ -1,0 +1,44 @@
+- name: install Apache
+  package:
+    name: "{{ apache_package }}"
+    state: present
+  register: foo
+
+- debug: var=foo
+  
+- name: copy config
+  copy:
+    src: files/test.conf
+    dest: "{{ apache_config_dir }}"
+  notify: restart apache
+
+# führt Handler gleich aus, nicht am Ende des Playbooks
+# --force-handlers beim Aufruf des Playbook führt Handler aus auch wenn Play fehlschlägt
+- name: make shure handlers are flushed immediately
+  meta: flush_handlers
+  
+- name: Ensure Apache is running on start
+  service:
+    name: "{{ apache_package }}"
+    state: started
+    enabled: true
+    
+# sucht nach 'ENV_VAR' -> wenn nicht vorhanden, dann fügt er Ausdruck am Ende an
+    #- name: add an environment variable to the remote user's shell
+    #  lineinfile:
+    #    dest: ~/.bashrc
+    #    regexp: '^ENV_VAR='
+    #    line: 'ENV_VAR=value'
+    #  become: false
+
+    
+    #- name: get the value of environment variable
+    #  # shell nutzt standardmäßig /bin/bash über ssh Verbindung
+    #  # command für Befehle direkt aus
+    #  # Setzen einer globalen Variablen in /etc/environment
+    #  # funktioniert hier bei ubuntu nicht
+    #  shell: "source ~/.bashrc && echo ${ENV_VAR}"
+    #  register: foo
+    #  become: false
+
+    #- debug: msg="Environment variable value = {{ foo }}"

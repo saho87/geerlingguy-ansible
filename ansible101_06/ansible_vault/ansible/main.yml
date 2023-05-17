@@ -1,0 +1,15 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  
+  vars_files:
+    - vars/api_key.yml
+  tasks:
+    - name: print api_key
+      shell: echo $API_KEY
+      environment:
+        API_KEY: "{{ api_key }}"
+      register: echo_result
+
+    - debug: var=echo_result.stdout

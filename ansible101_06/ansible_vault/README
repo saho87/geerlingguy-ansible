@@ -1,0 +1,19 @@
+# Empfehlung: alle Verschlüsselten Variablen in einer Datei, alle unverschlüsselten in einer anderen
+
+# Verschlüsseln des Passworts
+ansible-vault encrypt vars/api_key.yml
+
+# Entschlüsseln des Passworts - nicht empfohlen
+ansible-vault decrypt vars/api_key.yml
+
+# Editieren über Ansible-Vault
+ansible-vault edit vars/api_key.yml
+
+# Ausführen des Playbooks, Passwort muss eingegeben werden
+ansible-playbook main.yml --ask-vault-pass
+
+# Ausführen des Playbooks, Passwort liegt lokal
+ansible-playbook main.yml --vault-password-file ~/pw
+
+# Umbenennen des PW
+ansible-vault rekey vars/api_key.yml

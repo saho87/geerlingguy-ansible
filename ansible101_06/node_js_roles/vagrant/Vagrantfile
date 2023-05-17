@@ -1,0 +1,18 @@
+Vagrant.configure("2") do |config|
+  config.vm.define "centos" do |centos|
+    centos.vm.box = "centos/7"
+    config.ssh.insert_key = false
+    config.vm.synced_folder ".", "/vagrant", disable:true
+    centos.vm.hostname = "nodejs.test"
+    centos.vm.network "private_network", ip: "192.168.56.55"
+    centos.vm.provider "virtualbox" do |vb|
+      vb.memory = 256
+      vb.linked_clone = true
+      vb.name = "centos"
+    end
+  end
+    # Ansible provisioner - execute automatically ansible
+  config.vm.provision :ansible do |ansible|
+    ansible.playbook = "/home/sascha/Projects/geerlingguy-ansible/6_node_js/ansible/main.yml"
+  end
+end

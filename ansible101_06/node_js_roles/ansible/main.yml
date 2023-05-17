@@ -1,0 +1,36 @@
+---
+- hosts: all
+  become: yes
+
+  vars:
+    node_apps_location: /usr/local/opt/node
+
+  roles:
+  - nodejs
+  
+  tasks:    
+  - name: ensure Node.js app folder exists
+    file:
+      path: "{{ node_apps_location }}"
+      state: directory
+  
+  - name: Copy example Node.js app to server
+    copy:
+      src: /home/sascha/Projects/geerlingguy-ansible/6_node_js/app
+      dest: "{{ node_apps_location }}"
+  
+  - name: Install app dependencies defined in package.json
+    npm:
+      path: "{{ node_apps_location }}/app"
+  
+  - name: Check list of runnig Node.js apps.
+    command: /usr/local/bin/forever list
+    register: forever_list
+    #changed_when: false
+
+  - name: debugg
+    debug: var=forever_list.stdout
+
+  - name: Start example Node.js app.
+    command: "/usr/local/bin/forever start {{ node_apps_location }}/app/app.js"
+    when: "forever_list.stdout.find(node_apps_location + '/app/app.js') == -1"
