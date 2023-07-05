@@ -1,0 +1,7 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: "Include saho.myrole"
+      include_role:
+        name: "saho.myrole"

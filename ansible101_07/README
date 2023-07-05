@@ -1,0 +1,77 @@
+### ###  00 ansible galaxy ### ###
+
+# die Install Anweisung installiert die Rolle in ~/.ansible/roles
+ansible-galaxy install geerlingguy.homebrew
+
+# es besteht die Möglichkeit, die Rolle auch (in gewünschter Version) im Projektverzeichnis zu speichern
+# dazu muss eine lokale requirements.yml angelegt werden
+# die Rolle wird dann so installiert:
+ansible-galaxy install -r requirements.yml
+
+# zum Ausführen der Playbooks, muss in einer ansible.cfg der lokale Pfad der Rolle angegeben werden
+
+# ########################################01 Testing und Debugging ########################################
+
+#  yamllint (yaml ist korrekt)
+#  ansible-playbool --syntax-check (playbook kann ausgeführt werden)
+#  ansible-lint (playbook erfüllt die best practices)
+#  molecule test (integration)
+#  ansible-playbook --check (against prod)
+#  Parallel infrastructure
+
+# ######################################## 03 yamllint #########################################
+
+# zum Installieren 
+sudo apt install yamllint
+
+# zum linten: 
+yamllint . 
+
+# ######################################## 04 syntax-check ########################################
+
+# überprüft die Syntax des Playbook (auch includes und imports), ohne es auszuführen
+# findet includes- Fehler nicht, da diese dynamisch zur Laufzeit eingebunden werden
+ansible-playbook syntax-check.yml --syntax-check
+
+# ######################################## 05 ansible-lint ########################################
+
+# überprüft Playbooks auf bewährte Praktiken, Stilrichtlinien und potentielle Fehler
+# Installation
+sudo apt install ansible-lint
+
+# ausführen des Checks
+ansible-lint main.yml
+
+# ######################################## 06 molecule ########################################
+
+# Vorteil: keine VM muss durch Vagrant bereitgestellt werden, da alles über Docker bereitgestellt wird
+# Molecule ist eine Testumgebung mit Docker zum Testen von Rollen und Playbooks
+
+# Installation (docker muss installiert sein & User muss Docker Gruppe angehören)
+pip install molecule
+pip install molecule-plugins[docker]'
+
+# eine neue Rolle mit molecule erzeugen
+molecule init role saho.myrole --driver-name docker
+
+
+# testen der Rolle
+molecule test
+
+# testen aber den Container zum Testen laufen lassen
+molecule converge
+
+# converge mit Variablen ausführen
+MOLECULE_DISTRO=debian11 molecule converge
+
+
+# login in den laufenden Container (nach Nutzung von molecule converge)
+molecule login
+
+# zum Debuggen kann das fail plugin genutzt werden
+- fail
+
+# nur das verify playbook ausführen
+molecule verify
+
+

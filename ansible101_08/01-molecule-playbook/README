@@ -1,0 +1,2 @@
+# erstellt default scenario um playbooks zu testen
+molecule init scenario

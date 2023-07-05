@@ -1,0 +1,8 @@
+# Erstellen einer Rolle inklusive Ordnerstruktur
+ansible-galaxy role init myrole
+
+# Installation von molecule (ggf. Path Variable anpassen)
+pip3 install molecule
+
+# Erstellen einer eigenen Rolle über molecule (wie galaxy Rolle nur mit zusatzl. Ordner molecule)
+molecule init role saho87.myrole
